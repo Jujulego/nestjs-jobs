@@ -21,3 +21,6 @@ export function JobParameter(extractor: JobExtractor) {
     Reflect.set(target, JOB_PARAMETERS_KEY, parameters);
   };
 }
+
+export const JobStartedAt = JobParameter((job) => job.startedAt);
+export const JobStartedBy = JobParameter((job) => job.startedBy);
