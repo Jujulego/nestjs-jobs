@@ -1,4 +1,5 @@
-import { IJobExec, JobExecutor } from './executor/executor.service';
+import { JobExecutor } from './executor/executor.service';
+import { IJobExec } from './executor/job';
 
 // Service
 @JobExecutor('job2')

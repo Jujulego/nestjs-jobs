@@ -1,14 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-
-// Types
-export interface IJobExec {
-  exec(): void;
-}
-
-export interface JobExecType {
-  new(...args: any[]): IJobExec;
-}
+import { IJob, JobExecType } from './job';
+import { JOB_PARAMETERS_KEY, JobParameterRegistry } from './executor.parameters';
 
 // Service
 @Injectable()
@@ -26,12 +19,16 @@ export class ExecutorService {
   }
 
   // Methods
-  async exec(job: string): Promise<void> {
-    const token = ExecutorService._registry[job];
-    if (!token) throw new Error(`No executor for job ${job}`);
+  async exec(name: string, job: IJob): Promise<void> {
+    // Instantiate executor
+    const token = ExecutorService._registry[name];
+    if (!token) throw new Error(`No executor for job ${name}`);
 
     const executor = await this._module.get(token, { strict: false });
-    executor.exec();
+
+    // Build parameters array
+    const parameters: JobParameterRegistry = Reflect.get(executor, JOB_PARAMETERS_KEY) ?? [];
+    executor.exec.apply(executor, parameters.map((ext) => ext && ext(job)));
   }
 }
 
